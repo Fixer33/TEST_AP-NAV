@@ -30,6 +30,12 @@ public static class NetworkPacketHandle
         _handlers.Add(PacketType.C_Autopilot, new NetworkPacketDelegate(AutopilotChange));
         _handlers.Add(PacketType.C_VehicleSignal, new NetworkPacketDelegate(VehicleSignalChange));
         _handlers.Add(PacketType.C_RoutePointsSend, new NetworkPacketDelegate(RoutePointsPositions));
+        _handlers.Add(PacketType.ConnectionCheck, new NetworkPacketDelegate(ConnectionCheckRecieved));
+    }
+
+    private static void ConnectionCheckRecieved(ref DataStreamReader stream)
+    {
+        Network.instance.ConnectionCheckRecieved();
     }
 
     private static void AutopilotChange(ref DataStreamReader stream)

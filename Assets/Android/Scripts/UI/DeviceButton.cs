@@ -12,7 +12,7 @@ public class DeviceButton : MonoBehaviour
 
     public void SetIp(string ip)
     {
-        if (Regex.Match(ip, @"\b\d{3}\.\d{3}\.\d{3}\.\d{3}\b").Success == false)
+        if (Regex.Match(ip, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}").Success == false)
             return;
 
         Ip = ip;

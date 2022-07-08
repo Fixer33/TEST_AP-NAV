@@ -26,6 +26,12 @@ public static class NetworkPacketSender
         _handlers.Add(PacketType.S_VehiclePosition, new NetworkPacketDelegate(VehiclePosition));
         _handlers.Add(PacketType.S_VehicleFailure, new NetworkPacketDelegate(VehicleFailure));
         _handlers.Add(PacketType.S_ManualInput, new NetworkPacketDelegate(ManualInput));
+        _handlers.Add(PacketType.ConnectionCheck, new NetworkPacketDelegate(ConnectionCheckSend));
+    }
+
+    private static void ConnectionCheckSend(ref DataStreamWriter writer, object[] data)
+    {
+        writer.WriteByte(0);
     }
 
     private static void VehiclePosition(ref DataStreamWriter writer, object[] data)

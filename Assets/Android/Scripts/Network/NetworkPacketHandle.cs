@@ -31,6 +31,12 @@ public static class NetworkPacketHandle
         _handlers.Add(PacketType.S_VehiclePosition, new NetworkPacketDelegate(VehiclePosition));
         _handlers.Add(PacketType.S_VehicleFailure, new NetworkPacketDelegate(VehicleFailure));
         _handlers.Add(PacketType.S_ManualInput, new NetworkPacketDelegate(ManualInput));
+        _handlers.Add(PacketType.ConnectionCheck, new NetworkPacketDelegate(ConnectionCheckRecieved));
+    }
+
+    private static void ConnectionCheckRecieved(ref DataStreamReader stream)
+    {
+        Network.instance.ConnectionCheckRecieved();
     }
 
     private static void VehiclePosition(ref DataStreamReader stream)

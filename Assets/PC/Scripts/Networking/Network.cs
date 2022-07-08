@@ -10,11 +10,27 @@ public class Network : MonoBehaviour
 
     public bool IsConnected { get; private set; } = false;
 
+    private int _framesSinceLastConnectionCheck = 0;
+    private int _checkRate = 45;
+
     private void Start()
     {
         instance = this;
+        
     }
-
+    private void Update()
+    {
+        
+            if (IsConnected && _framesSinceLastConnectionCheck++ > 100)
+            {
+                NetworkServer.instance.Disconnect();
+            }
+    }
+    public void ConnectionCheckRecieved()
+    {
+        _framesSinceLastConnectionCheck = 0;
+        NetworkServer.instance.SendData(PacketType.ConnectionCheck);
+    }
     public void Connected()
     {
         IsConnected = true;

@@ -33,6 +33,14 @@ public class NetworkClient : MonoBehaviour
         Debug.Log("Connecting to " + endpoint);
     }
 
+    public void Disconnect()
+    {
+        _connection.Disconnect(_driver);
+        _driver.Disconnect(_connection);
+        _connection = default;
+        _network.ConnectionLost();
+    }
+
     public void OnDestroy()
     {
         _driver.Dispose();

@@ -31,7 +31,7 @@ public class Navigator : MonoBehaviour
 
     private void UpdateNavigatorPosition()
     {
-        Vector3 normalizedPosition = new Vector3(_actualVehiclePosition.x / MapScaleMultiplier, _actualVehiclePosition.z / MapScaleMultiplier, 0);
+        Vector3 normalizedPosition = new Vector3(_actualVehiclePosition.x / MapScaleMultiplier, _actualVehiclePosition.z / MapScaleMultiplier, -0.5f);
         _navigatorMoving = StartCoroutine(MoveTo(normalizedPosition));
     }
     private IEnumerator MoveTo(Vector3 newPosition)

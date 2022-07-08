@@ -6,6 +6,7 @@ public enum PacketType : uint
     C_Autopilot = 3,
     S_ManualInput = 4,
     C_RoutePointsSend = 5,
+    ConnectionCheck = 6,
 
     other
 }

@@ -23,6 +23,8 @@ public class UI : MonoBehaviour
     private float _camZoomOnNewPointAdd = 3;
     private bool _routePointAdding = false;
 
+    public int DeviceButtonsCount { get { return DeviceButtonsParent.transform.childCount; } }
+
     private void Start()
     {
         instance = this;
@@ -102,10 +104,10 @@ public class UI : MonoBehaviour
 
     public void RefreshDeviceButtons(List<string> ipAdresses)
     {
-        //for (int i = 0; i < _deviceButtons.Count; i++)
-        //{
-        //    Destroy(_deviceButtons[i].gameObject);
-        //}
+        for (int i = 0; i < _deviceButtons.Count; i++)
+        {
+            Destroy(_deviceButtons[i].gameObject);
+        }
         foreach (var adress in ipAdresses)
         {
             GameObject newBut = Instantiate(DeviceButtonPrefab, Vector3.zero, Quaternion.identity, DeviceButtonsParent.transform);

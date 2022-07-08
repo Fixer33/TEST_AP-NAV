@@ -8,7 +8,7 @@ public class Loader : MonoBehaviour
     private void Start()
     {
 #if UNITY_ANDROID
-        SceneManager.LoadScene((int)SceneIndexes.Android_Main, LoadSceneMode.Single);
+        SceneManager.LoadScene((int)SceneIndexes.Android_Main);
 #else
         SceneManager.LoadScene((int)SceneIndexes.PC_Main, LoadSceneMode.Single);
 #endif

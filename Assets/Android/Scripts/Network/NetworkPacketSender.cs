@@ -26,6 +26,12 @@ public static class NetworkPacketSender
         _handlers.Add(PacketType.C_Autopilot, new NetworkPacketDelegate(ActivateAutopilot));
         _handlers.Add(PacketType.C_VehicleSignal, new NetworkPacketDelegate(ToggleVehicleSignal));
         _handlers.Add(PacketType.C_RoutePointsSend, new NetworkPacketDelegate(RoutePointsPositionSend));
+        _handlers.Add(PacketType.ConnectionCheck, new NetworkPacketDelegate(ConnectionCheckSend));
+    }
+
+    private static void ConnectionCheckSend(ref DataStreamWriter writer, object[] data)
+    {
+        writer.WriteByte(0);
     }
 
     private static void ActivateAutopilot(ref DataStreamWriter writer, object[] data)

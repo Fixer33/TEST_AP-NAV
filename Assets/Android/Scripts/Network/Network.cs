@@ -1,7 +1,9 @@
 #if UNITY_ANDROID
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
@@ -13,9 +15,43 @@ public class Network : MonoBehaviour
 
     private List<string> _visibleIpAdresses = new List<string>();
 
+    private int _framesSinceLastConnectionCheck = 0;
+    private bool _connectionCheckActive = false;
+
     private void Start()
     {
         instance = this;
+        RefreshDevices();
+    }
+
+    private void Update()
+    {
+        if (_connectionCheckActive)
+        {
+            if (IsConnected && _framesSinceLastConnectionCheck++ > 100)
+            {
+                NetworkClient.instance.Disconnect();
+            }
+        }
+        else
+        {
+            if (Time.frameCount % 45 == 0)
+            {
+                _framesSinceLastConnectionCheck = 0;
+                NetworkClient.instance.SendData(PacketType.ConnectionCheck);
+            }
+        }
+        if (_visibleIpAdresses.Count > 0 && UI.instance.DeviceButtonsCount != _visibleIpAdresses.Count)
+        {
+            UI.instance.RefreshDeviceButtons(_visibleIpAdresses);
+        }
+    }
+
+    public void ConnectionCheckRecieved()
+    {
+        _framesSinceLastConnectionCheck = 0;
+        _connectionCheckActive = false;
+        NetworkClient.instance.SendData(PacketType.ConnectionCheck);
     }
 
     public void Connect(string validIp)
@@ -33,28 +69,37 @@ public class Network : MonoBehaviour
 
     private IEnumerator RefreshAvaibleIpList()
     {
-        print(1);
         _visibleIpAdresses.Clear();
+        string localIpSelf = GetLocalIp();
         List<Ping> toPing = new List<Ping>();
-        for (int q2 = 168; q2 < 170; q2++)
+
+        var matches = Regex.Match(localIpSelf, @"192\.168\.(\d{1,3})\.(\d{1,3})");
+        string q3 = matches.Groups[1].Value;
+        int q4 = int.Parse(matches.Groups[2].Value);
+        int min = q4 - 20;
+        int max = q4 + 20;
+        if (min < 1)
+            min = 1;
+        if (max > 254)
+            max = 254;
+
+        for (int i = min; i < max; i++)
         {
-            List<int> possibleQ3 = new List<int>() { 0, 1, 3, 7, 15, 31, 63, 127, 255 };
-            foreach (var q3 in possibleQ3)
+            string ipToCheck = $"192.168.{q3}.{i}";
+            if (ipToCheck == localIpSelf)
             {
-                for (int q4 = 1; q4 < 254; q4++)
-                {
-                    string ip = $"192.{q2}.{q3}.{q4}";
-                    toPing.Add(new Ping(ip));
-                }
+                _visibleIpAdresses.Add(localIpSelf);
+                continue;
             }
+            Ping p = new Ping(ipToCheck);
+            toPing.Add(p);
         }
+
         for (int i = 0; i < 100; i++)
         {
             for (int k = 0; k < toPing.Count; k++)
             {
                 Ping p = toPing[k];
-                if (p.isDone)
-                    print("==");
                 if (p.isDone && _visibleIpAdresses.Contains(p.ip) == false)
                     _visibleIpAdresses.Add(p.ip);
             }
@@ -67,18 +112,32 @@ public class Network : MonoBehaviour
         }
         toPing.Clear();
         yield return new WaitForSeconds(0.05f);
-        UI.instance.RefreshDeviceButtons(_visibleIpAdresses);
+    }
+    private string GetLocalIp()
+    {
+        string hostName = Dns.GetHostName();
+        var host = Dns.GetHostByName(hostName);
+        for (int i = 0; i < host.AddressList.Length; i++)
+        {
+            string adress = host.AddressList[i].ToString();
+            if (Regex.Match(adress, @"\b192\.168\.\d{1,3}\.\d{1,3}\b").Success)
+                return adress;
+        }
+        return "127.0.0.1";
     }
 
     public void ConnectionEstablished()
     {
         IsConnected = true;
+        NetworkClient.instance.SendData(PacketType.ConnectionCheck);
+        _connectionCheckActive = true;
         UI.instance.SetConnectionPanelVisibility(false);
     }
 
     public void ConnectionLost()
     {
         IsConnected = false;
+        _connectionCheckActive = false;
         UI.instance.SetConnectionPanelVisibility(true);
     }
 }

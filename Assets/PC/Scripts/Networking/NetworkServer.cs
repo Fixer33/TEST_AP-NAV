@@ -23,7 +23,7 @@ public class NetworkServer : MonoBehaviour
         StartServer();
     }
 
-    #region Shutdown
+#region Shutdown
     private void OnDestroy()
     {
         ShutdownServer();
@@ -36,7 +36,7 @@ public class NetworkServer : MonoBehaviour
             _connection = default;
         }
     } 
-    #endregion
+#endregion
 
     private void Update()
     {
@@ -61,6 +61,15 @@ public class NetworkServer : MonoBehaviour
             _driver.Listen();
 
         _connection = default;
+    }
+    
+
+    public void Disconnect()
+    {
+        _connection.Disconnect(_driver);
+        _driver.Disconnect(_connection);
+        _connection = default;
+        Network.instance.Disconnected();
     }
     private string GetLocalIp()
     {
